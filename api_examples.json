@@ -1,0 +1,297 @@
+// ============================================
+// 1. Extract Measurements Endpoint
+// ============================================
+
+// REQUEST: POST /api/v1/extract_measurements
+{
+  "method": "POST",
+  "headers": {
+    "Content-Type": "multipart/form-data"
+  },
+  "form_data": {
+    "file": "user_photo.jpg",
+    "height_cm": 178,
+    "image_type": "front"
+  }
+}
+
+// RESPONSE: 200 OK
+{
+  "measurements": {
+    "chest": 102.5,
+    "waist": 84.2,
+    "hips": 96.8,
+    "inseam": 76.4,
+    "shoulders": 44.6,
+    "arm_length": 62.3,
+    "torso_length": 51.8,
+    "neck": 38.2,
+    "thigh": 58.4,
+    "calf": 37.6,
+    "bicep": 32.1,
+    "forearm": 27.8,
+    "height": 178.0,
+    "weight": null,
+    "body_type": "athletic"
+  },
+  "confidence": 0.87,
+  "body_type": "athletic"
+}
+
+// ============================================
+// 2. Size Recommendation Endpoint
+// ============================================
+
+// REQUEST: POST /api/v1/recommend_size
+{
+  "user_measurements": {
+    "chest": 102.5,
+    "waist": 84.2,
+    "hips": 96.8,
+    "inseam": 76.4,
+    "shoulders": 44.6,
+    "torso_length": 51.8
+  },
+  "garment_data": {
+    "brand": "Zara",
+    "product_id": "SKU-12345-SHIRT",
+    "sizes": {
+      "S": {
+        "chest": [92, 96],
+        "waist": [76, 80],
+        "hips": [88, 92],
+        "length": [68, 70]
+      },
+      "M": {
+        "chest": [96, 102],
+        "waist": [80, 86],
+        "hips": [92, 98],
+        "length": [70, 72]
+      },
+      "L": {
+        "chest": [102, 108],
+        "waist": [86, 92],
+        "hips": [98, 104],
+        "length": [72, 74]
+      },
+      "XL": {
+        "chest": [108, 114],
+        "waist": [92, 98],
+        "hips": [104, 110],
+        "length": [74, 76]
+      }
+    },
+    "fit": "regular",
+    "fabric": "100% cotton"
+  }
+}
+
+// RESPONSE: 200 OK
+{
+  "recommended_size": "L",
+  "fit_score": 0.88,
+  "fit_notes": [
+    "Perfect fit across chest",
+    "Slightly snug at waist - consider if you prefer looser fit",
+    "Good length for your torso"
+  ],
+  "alternatives": [
+    {
+      "size": "M",
+      "score": 0.76
+    },
+    {
+      "size": "XL",
+      "score": 0.65
+    }
+  ]
+}
+
+// ============================================
+// 3. Virtual Try-On Generation Endpoint
+// ============================================
+
+// REQUEST: POST /api/v1/generate_tryon
+{
+  "method": "POST",
+  "headers": {
+    "Content-Type": "multipart/form-data"
+  },
+  "form_data": {
+    "person_image": "user_full_body.jpg",
+    "garment_image": "shirt_product.jpg"
+  }
+}
+
+// RESPONSE: 200 OK
+{
+  "tryon_url": "https://cdn.example.com/tryons/abc123_result.jpg",
+  "status": "success",
+  "processing_time": 3.2,
+  "confidence_score": 0.91
+}
+
+// ============================================
+// 4. Batch Size Recommendation (Multiple Items)
+// ============================================
+
+// REQUEST: POST /api/v1/recommend_sizes_batch
+{
+  "user_measurements": {
+    "chest": 102.5,
+    "waist": 84.2,
+    "hips": 96.8,
+    "inseam": 76.4,
+    "shoulders": 44.6
+  },
+  "garments": [
+    {
+      "brand": "Zara",
+      "product_id": "SHIRT-001",
+      "category": "shirt",
+      "sizes": {
+        "M": {"chest": [96, 102], "waist": [80, 86]},
+        "L": {"chest": [102, 108], "waist": [86, 92]}
+      }
+    },
+    {
+      "brand": "H&M",
+      "product_id": "JEANS-002",
+      "category": "pants",
+      "sizes": {
+        "32": {"waist": [81, 84], "inseam": [76, 78]},
+        "34": {"waist": [86, 89], "inseam": [76, 78]}
+      }
+    }
+  ]
+}
+
+// RESPONSE: 200 OK
+{
+  "recommendations": [
+    {
+      "product_id": "SHIRT-001",
+      "recommended_size": "L",
+      "fit_score": 0.88,
+      "notes": ["Perfect fit across chest"]
+    },
+    {
+      "product_id": "JEANS-002",
+      "recommended_size": "32",
+      "fit_score": 0.92,
+      "notes": ["Excellent fit at waist and length"]
+    }
+  ],
+  "outfit_compatibility_score": 0.85
+}
+
+// ============================================
+// 5. User Preference Learning Endpoint
+// ============================================
+
+// REQUEST: POST /api/v1/feedback
+{
+  "user_id": "user_12345",
+  "product_id": "SKU-12345-SHIRT",
+  "purchased_size": "L",
+  "actual_fit": {
+    "chest": "perfect",
+    "waist": "slightly_loose",
+    "length": "perfect",
+    "overall_satisfaction": 4.5
+  },
+  "would_recommend": true,
+  "notes": "Great fit but wish it was slightly more fitted at waist"
+}
+
+// RESPONSE: 200 OK
+{
+  "status": "feedback_recorded",
+  "preferences_updated": true,
+  "future_recommendations_adjusted": true,
+  "similar_products_with_better_fit": [
+    {
+      "product_id": "SKU-67890-SHIRT",
+      "brand": "Zara",
+      "predicted_fit_score": 0.94
+    }
+  ]
+}
+
+// ============================================
+// 6. Brand Comparison Endpoint
+// ============================================
+
+// REQUEST: POST /api/v1/compare_brands
+{
+  "user_measurements": {
+    "chest": 102.5,
+    "waist": 84.2,
+    "hips": 96.8
+  },
+  "brands": ["Zara", "H&M", "Uniqlo", "Nike"],
+  "category": "t-shirt",
+  "user_usual_size": "L"
+}
+
+// RESPONSE: 200 OK
+{
+  "brand_recommendations": [
+    {
+      "brand": "Zara",
+      "recommended_size": "L",
+      "confidence": 0.88,
+      "notes": "True to size for your measurements"
+    },
+    {
+      "brand": "H&M",
+      "recommended_size": "XL",
+      "confidence": 0.84,
+      "notes": "H&M runs small - size up recommended"
+    },
+    {
+      "brand": "Uniqlo",
+      "recommended_size": "L",
+      "confidence": 0.91,
+      "notes": "Excellent fit expected"
+    },
+    {
+      "brand": "Nike",
+      "recommended_size": "M",
+      "confidence": 0.79,
+      "notes": "Nike runs large in this category"
+    }
+  ],
+  "consistency_analysis": {
+    "most_consistent_brand": "Uniqlo",
+    "least_consistent_brand": "H&M",
+    "size_variation_index": 0.23
+  }
+}
+
+// ============================================
+// ERROR RESPONSES
+// ============================================
+
+// ERROR: 400 Bad Request
+{
+  "error": "InvalidMeasurements",
+  "message": "Chest measurement must be between 60-150 cm",
+  "field": "chest",
+  "provided_value": 250
+}
+
+// ERROR: 404 Not Found
+{
+  "error": "ProductNotFound",
+  "message": "No size data available for product SKU-99999",
+  "suggestion": "Try searching by brand and category instead"
+}
+
+// ERROR: 500 Internal Server Error
+{
+  "error": "ModelError",
+  "message": "Failed to generate try-on image",
+  "retry_after": 30,
+  "support_ticket": "TECH-2024-001"
+}
